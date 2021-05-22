@@ -4,11 +4,15 @@
   <body>
     <h1>JavaScript Arguments micro benchmark test</h1>
 
+    <label>iterations:<input id="iterationsInput" value="50,000,000" autocomplete="off" /></label><br /><br />
+
     <button id="runNormalButton">Run normal</button> <span id="normalResult"></span><br />
     <button id="runLeakyArgumentsButton">Run leaky arguments</button> <span id="leakyArgumentsResult"></span><br />
     <button id="runSpreadOpButton">Run spread operator</button> <span id="spreadOpResult"></span><br />
-    <button id="runIndexedArgumentsButton">Run indexed arguments</button> <span id="indexedArgumentsResult"></span><br /><br />
+    <button id="runIndexedArgumentsButton">Run indexed arguments</button> <span id="indexedArgumentsResult"></span><br />
     <button id="runArgLengthButton">Run arguments length check</button> <span id="argLengthResult"></span><br />
+
+    <textarea id="results" autocomplete="off" style="width: 300px; height: 100px;"></textarea>
 
     <h2>How to test</h2>
 
@@ -20,56 +24,70 @@
     <h2>Test code</h2>
     <pre id="testCode"></pre><br />
     <script id="testScript">
-      const loopNum = 0x20000000;
+      let iterations;
+
+      function getIterations() {
+        iterations = parseInt(document.getElementById('iterationsInput').value.replaceAll(',', ''));
+        document.getElementById('results').value += `iterations ${iterations.toLocaleString()}\n`
+      }
+      getIterations();
+      document.getElementById('iterationsInput').addEventListener('input', getIterations);
+
+      function displayResult(id, time) {
+        const result = time.toFixed(2) + 'ms'
+        document.getElementById(id).innerText = result;
+        document.getElementById('results').value += `${id} ${result}\n`
+      }
+
 
       document.getElementById('runNormalButton').addEventListener('click', () => {
         const startTime = performance.now();
         let sum = 0;
-        for (let i = 0; i < loopNum; i++) {
+        for (let i = 0; i < iterations; i++) {
           sum += normalOp(1, 2);
         }
         const endTime = performance.now();
-        document.getElementById('normalResult').innerText = (endTime - startTime).toFixed(2) + 'ms';
+        displayResult('normalResult', endTime - startTime);
       });
 
       document.getElementById('runLeakyArgumentsButton').addEventListener('click', () => {
         const startTime = performance.now();
         let sum = 0;
-        for (let i = 0; i < loopNum; i++) {
+        for (let i = 0; i < iterations; i++) {
           sum += leakyArguments(1, 2);
         }
         const endTime = performance.now();
-        document.getElementById('leakyArgumentsResult').innerText = (endTime - startTime).toFixed(2) + 'ms';
+        displayResult('leakyArgumentsResult', endTime - startTime);
       });
 
       document.getElementById('runSpreadOpButton').addEventListener('click', () => {
         const startTime = performance.now();
         let sum = 0;
-        for (let i = 0; i < loopNum; i++) {
+        for (let i = 0; i < iterations; i++) {
           sum += spreadOp(1, 2);
         }
         const endTime = performance.now();
-        document.getElementById('spreadOpResult').innerText = (endTime - startTime).toFixed(2) + 'ms';
+        displayResult('spreadOpResult', endTime - startTime);
       });
 
       document.getElementById('runIndexedArgumentsButton').addEventListener('click', () => {
         const startTime = performance.now();
         let sum = 0;
-        for (let i = 0; i < loopNum; i++) {
+        for (let i = 0; i < iterations; i++) {
           sum += indexedArguments(1, 2);
         }
         const endTime = performance.now();
-        document.getElementById('indexedArgumentsResult').innerText = (endTime - startTime).toFixed(2) + 'ms';
+        displayResult('indexedArgumentsResult', endTime - startTime);
       });
 
       document.getElementById('runArgLengthButton').addEventListener('click', () => {
         const startTime = performance.now();
         let sum = 0;
-        for (let i = 0; i < loopNum; i++) {
+        for (let i = 0; i < iterations; i++) {
           sum += argLength(1, 2);
         }
         const endTime = performance.now();
-        document.getElementById('argLengthResult').innerText = (endTime - startTime).toFixed(2) + 'ms';
+        displayResult('argLengthResult', endTime - startTime);
       });
 
       const other = (a, b) => {
